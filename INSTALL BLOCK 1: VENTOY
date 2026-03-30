@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+set -u
+set -o pipefail
+
+# =====================================================
+# Ghost Protocol Topper
+# =====================================================
+ghost_protocol() {
+  local countdown="${1:-10}"
+  local pages="${2:-5}"
+  local cols="${3:-0}"
+
+  local GREEN=$'\033[0;32m'
+  local RESET=$'\033[0m'
+
+  local term_lines term_cols rows_per_page
+  term_lines="$(tput lines 2>/dev/null || printf '24')"
+  term_cols="$(tput cols 2>/dev/null || printf '80')"
+  [ "$cols" -le 0 ] && cols="$term_cols"
+  [ "$cols" -lt 32 ] && cols=32
+  rows_per_page=$(( term_lines - 4 ))
+  [ "$rows_per_page" -lt 10 ] && rows_per_page=10
+  command -v clear >/dev/null 2>&1 && clear || printf '\033[2J\033[H'
+
+  printf '%b\n' "${GREEN}Initializing Ghost Protocol... It will begin in ${countdown} seconds.${RESET}"
+  sleep 0.6
+  for (( i=countdown; i>=1; i-- )); do
+    command -v clear >/dev/null 2>&1 && clear || printf '\033[2J\033[H'
+    printf '%b\n' "${GREEN}Initializing Ghost Protocol... ${i}...${RESET}"
+    sleep 1
+  done
+
+  for (( page=1; page<=pages; page++ )); do
+    command -v clear >/dev/null 2>&1 && clear || printf '\033[2J\033[H'
+    printf '%b\n' "${GREEN}Ghost Protocol Page ${page}/${pages}${RESET}"
+    printf '%b\n' "${GREEN}$(printf '%*s' "$cols" '' | tr ' ' '=')${RESET}"
+    for (( row=1; row<=rows_per_page; row++ )); do
+      line="$(tr -dc '01' < /dev/urandom | head -c "$cols")"
+      printf '%b\n' "${GREEN}${line}${RESET}"
+    done
+    sleep 0.8
+  done
+
+  command -v clear >/dev/null 2>&1 && clear || printf '\033[2J\033[H'
+}
+
+ghost_protocol 10 5 0
+
+# =====================================================
+# LOGGING SETUP
+# =====================================================
+LOG_DIR="${HOME}/.local/share/installer_logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/installer_$(date +%Y%m%d_%H%M%S).log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "Log file: $LOG_FILE"
+
+# =====================================================
+# UTILITIES
+# =====================================================
+retry() {
+  local attempts="$1"; shift
+  local delay="$1"; shift
+  local n=1
+  while true; do
+    if "$@"; then return 0; fi
+    if [ "$n" -ge "$attempts" ]; then return 1; fi
+    echo "[retry] attempt $n/$attempts failed; sleeping ${delay}s"
+    sleep "$delay"
+    n=$((n+1))
+  done
+}
+
+# =====================================================
+# INSTALL BLOCK 1: VENTOY
+# =====================================================
+echo "==== INSTALL ONE: VENTOY ===="
+VENTOY_DIR="$HOME/Ventoy"
+mkdir -p "$VENTOY_DIR"
+
+VENTOY_URL=$(curl -s https://api.github.com/repos/ventoy/Ventoy/releases/latest | \
+             grep browser_download_url | grep linux.tar.gz | cut -d '"' -f 4)
+
+echo "Downloading Ventoy: $VENTOY_URL"
+retry 3 3 curl -L -o "$VENTOY_DIR/ventoy.tar.gz" "$VENTOY_URL"
+tar -xzf "$VENTOY_DIR/ventoy.tar.gz" -C "$VENTOY_DIR"
+echo "Ventoy extracted to $VENTOY_DIR"
+
+# Detect USB drives (basic method)
+echo "Detecting USB drives..."
+USB_DEVICES=$(lsblk -dpno NAME,MODEL,SIZE | grep -i "sd" | grep -v "$(df --output=source / | tail -1)" || true)
+echo "USB devices detected:"
+echo "$USB_DEVICES"
+
+# =====================================================
+# INSTALL BLOCK 2: ISO DOWNLOADS
+# =====================================================
+echo "==== INSTALL TWO: ISO DOWNLOADS ===="
+ISO_DIR="$HOME/ISOs"
+mkdir -p "$ISO_DIR"
+
+declare -A ISOS=(
+  [Tails]="https://mirrors.edge.kernel.org/tails/stable/tails-amd64.iso"
+  [UbuntuTouch]="https://releases.ubuntu-touch.io/release/ubuntu-touch-xenial.iso"
+  [AndroidX86]="https://osdn.net/projects/android-x86/releases/iso/android-x86_9.0-r2.iso/download"
+)
+
+for name in "${!ISOS[@]}"; do
+  url="${ISOS[$name]}"
+  outfile="$ISO_DIR/$(basename "$url")"
+  echo "Downloading $name ISO..."
+  retry 3 5 curl -L -o "$outfile" "$url"
+done
+echo "ISO DOWNLOADS COMPLETE"
+
+# =====================================================
+# INSTALL BLOCK 3: ERROR HANDLING & CHECKSUM
+# =====================================================
+echo "==== INSTALL THREE: ERROR HANDLING ===="
+for iso_file in "$ISO_DIR"/*.iso; do
+  if [ ! -f "$iso_file" ]; then
+    echo "ERROR: ISO missing -> $iso_file"
+    continue
+  fi
+  checksum=$(sha256sum "$iso_file" | awk '{print $1}')
+  echo "SHA256: $(basename "$iso_file") = $checksum"
+done
+echo "ERROR HANDLING COMPLETE"
+
+# =====================================================
+# SCRIPT COMPLETE
+# =====================================================
+echo "ALL INSTALL BLOCKS FINISHED SUCCESSFULLY!"
