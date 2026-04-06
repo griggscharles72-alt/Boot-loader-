@@ -1,0 +1,130 @@
+amnesia@amnesia:~/Ventoy$ lsblk
+NAME                   MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINTS
+loop0                    7:0    0   1.8G  1 loop  /usr/lib/live/mount/rootfs/filesystem.squashfs
+loop1                    7:1    0 732.5M  1 loop  /usr/lib/live/mount/rootfs/7.6.squashfs
+sda                      8:0    1  28.9G  0 disk  
+├─sda1                   8:1    1     8G  0 part  /usr/lib/live/mount/medium
+└─sda2                   8:2    1  20.9G  0 part  
+  └─TailsData_unlocked 254:0    0  20.9G  0 crypt /var/lib/apt/lists
+                                                  /run/nosymfollow/var/lib/apt/lists
+                                                  /var/cache/apt/archives
+                                                  /run/nosymfollow/var/cache/apt/archives
+                                                  /home/amnesia/Persistent
+                                                  /run/nosymfollow/home/amnesia/Persistent
+                                                  /run/nosymfollow/live/persistence/TailsData_unlocked
+                                                  /live/persistence/TailsData_unlocked
+sdb                      8:16   1  28.9G  0 disk  
+zram0                  253:0    0  15.4G  0 disk  [SWAP]
+nvme0n1                259:0    0 476.9G  0 disk  
+├─nvme0n1p1            259:1    0   100M  0 part  
+├─nvme0n1p2            259:2    0    16M  0 part  
+├─nvme0n1p3            259:3    0  48.2G  0 part  
+├─nvme0n1p4            259:4    0   546M  0 part  
+└─nvme0n1p5            259:5    0 428.1G  0 part  
+amnesia@amnesia:~/Ventoy$ cd ~/Ventoy
+sudo ./Ventoy2Disk.sh -i /dev/sdX
+[sudo] password for amnesia:  
+sudo: ./Ventoy2Disk.sh: command not found
+amnesia@amnesia:~/Ventoy$ cd ~/Ventoy
+sudo ./Ventoy2Disk.sh -i /dev/sdX
+[sudo] password for amnesia:  
+sudo: ./Ventoy2Disk.sh: command not found
+amnesia@amnesia:~/Ventoy$ cd ~/Ventoy/ventoy-1.1.11
+sudo ./Ventoy2Disk.sh -i /dev/sdb
+[sudo] password for amnesia:  
+
+**********************************************
+      Ventoy: 1.1.11  x86_64
+      longpanda admin@ventoy.net
+      https://www.ventoy.net
+**********************************************
+
+Disk : /dev/sdb
+Model: PNY USB 2.0 FD (scsi)
+Size : 28 GiB
+Style: MBR
+
+
+Attention:
+You will install Ventoy to /dev/sdb.
+All the data on the disk /dev/sdb will be lost!!!
+
+Continue? (y/n) y
+
+All the data on the disk /dev/sdb will be lost!!!
+Double-check. Continue? (y/n) y
+
+Create partitions on /dev/sdb by parted in MBR style ...
+Done
+Wait for partitions ...
+partition exist OK
+create efi fat fs /dev/sdb2 ...
+mkfs.fat 4.2 (2021-01-31)
+success
+Wait for partitions $vPART1 and $vPART2 ...
+/dev/sdb1 exist OK
+/dev/sdb2 exist OK
+partition exist OK
+Format partition 1 /dev/sdb1 ...
+mkexfatfs 1.3.0
+Creating... done.
+Flushing... done.
+File system created successfully.
+mkexfatfs success
+writing data to disk ...
+sync data ...
+esp partition processing ...
+
+Install Ventoy to /dev/sdb successfully finished.
+
+amnesia@amnesia:~/Ventoy/ventoy-1.1.11$ cp *.iso /media/amnesia/Ventoy/
+cp: cannot stat '*.iso': No such file or directory
+amnesia@amnesia:~/Ventoy/ventoy-1.1.11$ cp ~/ISOs/*.iso /media/amnesia/Ventoy/
+cp: target '/media/amnesia/Ventoy/': No such file or directory
+amnesia@amnesia:~/Ventoy/ventoy-1.1.11$ rm ~/ISOs/*.iso
+amnesia@amnesia:~/Ventoy/ventoy-1.1.11$ cd ~/ISOs
+
+curl -L -o tails.iso https://download.tails.net/tails/stable/tails-amd64.iso
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    10  100    10    0     0      6      0  0:00:01  0:00:01 --:--:--     6
+amnesia@amnesia:~/ISOs$ ls -lh tails.iso
+-rw-rw-r-- 1 amnesia amnesia 10 Apr  6 03:00 tails.iso
+amnesia@amnesia:~/ISOs$ cp tails.iso /media/amnesia/Ventoy/
+cp: cannot create regular file '/media/amnesia/Ventoy/': No such file or directory
+amnesia@amnesia:~/ISOs$ lsblk
+NAME                   MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINTS
+loop0                    7:0    0   1.8G  1 loop  /usr/lib/live/mount/rootfs/filesystem.squashfs
+loop1                    7:1    0 732.5M  1 loop  /usr/lib/live/mount/rootfs/7.6.squashfs
+sda                      8:0    1  28.9G  0 disk  
+├─sda1                   8:1    1     8G  0 part  /usr/lib/live/mount/medium
+└─sda2                   8:2    1  20.9G  0 part  
+  └─TailsData_unlocked 254:0    0  20.9G  0 crypt /var/lib/apt/lists
+                                                  /run/nosymfollow/var/lib/apt/lists
+                                                  /var/cache/apt/archives
+                                                  /run/nosymfollow/var/cache/apt/archives
+                                                  /home/amnesia/Persistent
+                                                  /run/nosymfollow/home/amnesia/Persistent
+                                                  /run/nosymfollow/live/persistence/TailsData_unlocked
+                                                  /live/persistence/TailsData_unlocked
+sdb                      8:16   1  28.9G  0 disk  
+├─sdb1                   8:17   1  28.9G  0 part  
+└─sdb2                   8:18   1    32M  0 part  
+zram0                  253:0    0  15.4G  0 disk  [SWAP]
+nvme0n1                259:0    0 476.9G  0 disk  
+├─nvme0n1p1            259:6    0   100M  0 part  
+├─nvme0n1p2            259:7    0    16M  0 part  
+├─nvme0n1p3            259:8    0  48.2G  0 part  
+├─nvme0n1p4            259:9    0   546M  0 part  
+└─nvme0n1p5            259:10   0 428.1G  0 part  
+amnesia@amnesia:~/ISOs$ mkdir ~/ventoy_usb
+amnesia@amnesia:~/ISOs$ sudo mount /dev/sdb1 ~/ventoy_usb
+[sudo] password for amnesia:  
+amnesia@amnesia:~/ISOs$ ls ~/ventoy_usb
+amnesia@amnesia:~/ISOs$ cat tails.iso
+Not Found
+amnesia@amnesia:~/ISOs$ curl -L -o tails.iso https://mirrors.edge.kernel.org/tails/stable/tails-amd64.iso
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1882  100  1882    0     0   1759      0  0:00:01  0:00:01 --:--:--  1760
+amnesia@amnesia:~/ISOs$ ls -lh tails.iso
