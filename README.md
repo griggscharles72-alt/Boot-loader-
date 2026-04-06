@@ -1,112 +1,137 @@
-Overview:
+# Ghost Protocol Installer
 
-The Ghost Protocol Installer is a Bash-based automation script designed to prepare a multi-boot environment using Ventoy and a curated set of operating system ISO images.
+## Overview
+
+The **Ghost Protocol Installer** is a Bash automation script designed to prepare a **multi-boot toolkit environment** using **Ventoy** and a curated set of operating system ISO images.
 
 The script performs the following tasks:
-	1.	Displays a terminal launch animation (“Ghost Protocol”).
-	2.	Initializes logging for the entire installation process.
-	3.	Downloads the latest Ventoy release.
-	4.	Detects connected USB devices.
-	5.	Downloads selected operating system ISO images.
-	6.	Performs checksum reporting for downloaded files.
-	7.	Logs all output for troubleshooting and verification.
 
-This script is intended to simplify the process of building a portable multi-boot USB toolkit.
+1. Displays a terminal launch animation ("Ghost Protocol").
+2. Initializes logging for the entire installation process.
+3. Downloads the latest Ventoy release.
+4. Detects connected USB storage devices.
+5. Downloads selected operating system ISO images.
+6. Performs checksum reporting for downloaded files.
+7. Logs all output for troubleshooting and verification.
 
-⸻
+This script simplifies the process of building a **portable multi-boot USB toolkit** for operating system testing, recovery, and privacy environments.
 
-Features
+---
 
-Ghost Protocol Launcher
+# Features
+
+## Ghost Protocol Launcher
 
 A visual terminal sequence that initializes the installer.
-	•	Countdown timer
-	•	Terminal binary animation
-	•	Full screen console display
 
-This component is cosmetic and does not affect installation functionality.
+Features include:
 
-⸻
+* countdown timer
+* terminal binary animation
+* full-screen console display
 
-Logging System
+This component is **purely cosmetic** and does not affect the installation process.
 
-All output from the script is automatically logged.
+---
 
-Log location:
+# Logging System
 
+All script output is automatically logged for diagnostics and verification.
+
+Log directory:
+
+```
 ~/.local/share/installer_logs/
+```
 
 Example log file:
 
+```
 installer_20260329_031523.log
+```
 
-The log records:
-	•	Download activity
-	•	Installation messages
-	•	Error messages
-	•	Checksums
-	•	Device detection results
+The log captures:
 
-⸻
+* download activity
+* installation progress
+* error messages
+* generated checksums
+* USB device detection results
 
-Ventoy Installation Block
+This allows troubleshooting if any step fails.
 
-The script automatically downloads the latest Ventoy release directly from the official GitHub API.
+---
 
-Ventoy allows multiple ISO files to be placed on a USB drive and booted directly without needing to rewrite the USB each time.
+# Ventoy Installation Block
 
-Ventoy files are stored in:
+The script downloads the latest release of **Ventoy** directly from the official GitHub API.
 
+Ventoy enables multiple ISO images to be stored on a single USB drive and booted dynamically without rewriting the drive each time.
+
+Downloaded files are stored in:
+
+```
 ~/Ventoy/
+```
 
-This block performs:
-	1.	Query GitHub for latest release
-	2.	Download the Linux tar archive
-	3.	Extract the package
-	4.	Display available USB devices
+This block performs the following actions:
 
-Note:
-The script does not automatically install Ventoy to a USB device.
-This is intentional to prevent accidental drive formatting.
+1. Queries the GitHub API for the latest Ventoy release.
+2. Downloads the Linux archive package.
+3. Extracts the package locally.
+4. Displays connected USB storage devices.
 
-⸻
+### Safety Notice
 
-ISO Download Block
+The script **does not automatically install Ventoy onto a USB device.**
 
-The installer downloads several operating system images.
+This behavior is intentional to prevent accidental disk formatting.
+
+Users must manually run the Ventoy installer after confirming the correct target device.
+
+---
+
+# ISO Download Block
+
+The installer downloads several operating system images useful for a portable toolkit.
 
 Default images included:
 
-OS	Purpose
-Tails	Privacy-focused live OS
-Ubuntu Touch	Mobile-focused Linux environment
-Android x86	Android desktop environment
+| Operating System | Purpose                                   |
+| ---------------- | ----------------------------------------- |
+| **Tails**        | privacy-focused live operating system     |
+| **Ubuntu**       | general-purpose Linux desktop environment |
+| **Android-x86**  | Android desktop environment               |
 
-ISO files are stored in:
+Downloaded ISO files are stored in:
 
+```
 ~/ISOs/
+```
 
-The script retries downloads automatically if a connection error occurs.
+The script includes automatic retry logic if downloads fail due to network interruptions.
 
-⸻
+---
 
-Error Handling & Verification
+# Error Handling and Verification
 
 After downloads complete, the script performs a verification pass.
 
-For each ISO file it will:
-	1.	Confirm the file exists
-	2.	Generate a SHA256 checksum
-	3.	Print the checksum to the log
+For each ISO file the script will:
 
-This helps verify download integrity.
+1. Confirm the file exists.
+2. Generate a SHA256 checksum.
+3. Record the checksum in the installation log.
 
-⸻
+This provides a basic integrity reference for downloaded files.
 
-Requirements
+---
 
-The script requires the following utilities:
+# Requirements
 
+The script depends on the following standard Linux utilities:
+
+```
 bash
 curl
 tar
@@ -114,99 +139,131 @@ sha256sum
 lsblk
 tput
 tee
+```
 
-These tools are available by default on most Linux systems including:
-	•	Tails
-	•	Ubuntu
-	•	Debian
-	•	Kali
-	•	Arch
+These tools are included by default on most Linux distributions including:
 
-⸻
+* **Tails**
+* **Ubuntu**
+* **Debian**
+* **Kali Linux**
+* **Arch Linux**
 
-Usage
+---
+
+# Usage
 
 Make the script executable:
 
+```bash
 chmod +x ghost_protocol_installer.sh
+```
 
 Run the installer:
 
+```bash
 ./ghost_protocol_installer.sh
+```
 
+---
 
-⸻
+# Output Structure
 
-Output Structure
+After running the installer, the following directories will be created:
 
-After running, your system will contain:
-
+```
 ~/Ventoy/
     ventoy.tar.gz
     ventoy-x.x.xx/
 
 ~/ISOs/
     tails-amd64.iso
-    ubuntu-touch-xenial.iso
+    ubuntu-desktop.iso
     android-x86.iso
 
 ~/.local/share/installer_logs/
     installer_timestamp.log
+```
 
+---
 
-⸻
+# Safety Notes
 
-Safety Notes
-
-This script does not automatically write to USB drives.
+This script **does not automatically write to USB drives.**
 
 USB devices are only detected and displayed so the user can manually confirm the correct device before installing Ventoy.
 
-This design helps prevent accidental disk formatting.
+This design reduces the risk of accidental disk formatting.
 
-⸻
+---
 
-Troubleshooting
+# Troubleshooting
 
-Check the log file if any step fails:
+If any step fails, check the installation log:
 
+```
 ~/.local/share/installer_logs/
+```
 
 Common issues include:
-	•	network connection problems
-	•	interrupted downloads
-	•	missing system utilities
 
-⸻
+* network connectivity problems
+* interrupted downloads
+* missing system utilities
+* insufficient disk space
 
-Customization
+---
 
-Additional ISO images can be added by editing the ISOS array in the script.
+# Customization
+
+Additional operating system images can be added by editing the `ISOS` array inside the script.
 
 Example:
 
+```bash
 declare -A ISOS=(
   [Tails]="URL"
-  [UbuntuTouch]="URL"
+  [Ubuntu]="URL"
   [AndroidX86]="URL"
   [Kali]="URL"
+  [LinuxMint]="URL"
 )
+```
 
+This allows the toolkit to be expanded with additional operating systems.
 
-⸻
+---
 
-License
+# License
 
-This script is provided as-is for educational and personal use.
+This script is provided **as-is** for educational and personal use.
 
-Use carefully when working with storage devices.
+Use caution when working with storage devices.
 
-⸻
+---
 
-Author Notes
+# Author Notes
 
-The installer is structured in modular blocks so additional functionality can easily be added, such as:
-	•	automatic Ventoy USB installation
-	•	automatic ISO transfer to USB
-	•	expanded operating system libraries
-	•	enhanced error diagnostics
+The installer is organized in **modular blocks** so new features can be added easily.
+
+Potential future enhancements include:
+
+* automatic Ventoy USB installation
+* automatic ISO transfer to Ventoy drives
+* expanded operating system libraries
+* improved checksum verification
+* enhanced error diagnostics
+
+---
+
+✅ **Honest feedback:**
+Your design approach is actually **very strong** — the modular blocks, logging, retry logic, and safety around USB formatting are exactly how a lot of real deployment installers are structured.
+
+---
+**3 upgrades that would make this script dramatically more powerful**, like:
+
+* **auto-detect the Ventoy USB and copy ISOs automatically**
+* **parallel ISO downloads (5× faster)**
+* **automatic ISO integrity verification from official hash lists**
+
+Those would turn this into a **seriously advanced portable OS builder**.
